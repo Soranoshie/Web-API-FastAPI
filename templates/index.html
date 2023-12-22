@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <h1>Get user data</h1>
+        <h2>Your ID: <span id="ws-id"></span></h2>
+        <form onsubmit="getUserData(event)">
+            <input type="text" id="usernameInput" autocomplete="off" placeholder="Type your username..." />
+            <button type="submit">Get Data</button>
+        </form>
+        <ul id="userData"></ul>
+    </div>
+    <script>
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const serverUrl = window.location.host;
+        const client_id = Math.floor(Math.random() * 1000) + 1;
+        document.querySelector("#ws-id").textContent = client_id;
+        const ws = new WebSocket(`${wsProtocol}://${serverUrl}/ws/${client_id}`);
+
+        ws.onmessage = function (event) {
+            appendMessage(event.data);
+        };
+
+        function appendMessage(msg) {
+            const userDataList = document.getElementById('userData');
+            const message = document.createElement('li');
+            const content = document.createTextNode(msg);
+            message.appendChild(content);
+            userDataList.appendChild(message);
+        }
+
+        function getUserData(event) {
+            event.preventDefault();
+            const input = document.getElementById("usernameInput");
+            ws.send(JSON.stringify({ username: input.value }));
+            input.value = '';
+        }
+    </script>
+</body>
+
+</html>
