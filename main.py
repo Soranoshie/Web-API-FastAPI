@@ -1,20 +1,19 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import models
+from models import event_model, user_model
+from db_context import engine
+from router import router_websocket, router_events, router_users
 
-from database import engine
-from routes import router_websocket, router_events, router_users
+event_model.Base.metadata.create_all(bind=engine)
+user_model.Base.metadata.create_all(bind=engine)
 
-# Создание таблиц в БД
-models.Base.metadata.create_all(bind=engine)
 
-# Templates
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI(
-    title="WebSocketChatCRUDNotify",
-    summary="WebSocket Chat + Notifications of CRUD operations!",
+    title="WebAPIPractice3",
+    summary="Get user data",
     version="0.0.1",
 )
 
@@ -31,7 +30,6 @@ async def read_root(request: Request):
                                        "server_urn": server_urn})
 
 
-# Подключаем созданные роутеры в приложение
 app.include_router(router_websocket)
 app.include_router(router_events)
 app.include_router(router_users)

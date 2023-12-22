@@ -1,12 +1,12 @@
 from typing import List
-
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-
-import schemas
-from database import get_db
+from schemas import event_schema, user_schema
+from db_context import get_db
 from sqlalchemy.orm import Session
-from crud import (
+from controller.event_controller import (
     create_event, get_events, get_event, update_event, delete_event,
+)
+from controller.user_controller import (
     create_user, get_users, get_user, update_user, delete_user
 )
 
@@ -58,27 +58,27 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
 
 
 # Events
-@router_events.post("/", response_model=schemas.Event)
-async def create_event_route(event_data: schemas.EventCreate, db: Session = Depends(get_db)):
-    event = create_event(db, event_data)
-    await notify_clients(f"Event added: {event.name}")
-    return event
+@router_events.post("/", response_model=event_schema.Event)
+async def create_event_route(event_data: event_schema.EventCreate, db: Session = Depends(get_db)):
+    current_event = create_event(db, event_data)
+    await notify_clients(f"Event added: {current_event.name}")
+    return current_event
 
 
-@router_events.get("/", response_model=List[schemas.Event])
+@router_events.get("/", response_model=List[event_schema.Event])
 async def read_events(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     events = get_events(db, skip=skip, limit=limit)
     return events
 
 
-@router_events.get("/{event_id}", response_model=schemas.Event)
+@router_events.get("/{event_id}", response_model=event_schema.Event)
 async def read_event(event_id: int, db: Session = Depends(get_db)):
-    event = get_event(db, event_id)
-    return event
+    current_event = get_event(db, event_id)
+    return current_event
 
 
-@router_events.patch("/{event_id}", response_model=schemas.Event)
-async def update_event_route(event_id: int, event_data: schemas.EventUpdate, db: Session = Depends(get_db)):
+@router_events.patch("/{event_id}", response_model=event_schema.Event)
+async def update_event_route(event_id: int, event_data: event_schema.EventUpdate, db: Session = Depends(get_db)):
     updated_event = update_event(db, event_id, event_data)
     if updated_event:
         await notify_clients(f"Event updated: {updated_event.name}")
@@ -96,27 +96,27 @@ async def delete_event_route(event_id: int, db: Session = Depends(get_db)):
 
 
 # Users
-@router_users.post("/", response_model=schemas.User)
-async def create_user_route(schema: schemas.UserCreate, db: Session = Depends(get_db)):
-    user = create_user(db, schema)
-    await notify_clients(f"User added: {user.name}")
-    return user
+@router_users.post("/", response_model=user_schema.User)
+async def create_user_route(schema: user_schema.UserCreate, db: Session = Depends(get_db)):
+    current_user = create_user(db, schema)
+    await notify_clients(f"User added: {current_user.name}")
+    return current_user
 
 
-@router_users.get("/", response_model=List[schemas.User])
+@router_users.get("/", response_model=List[user_schema.User])
 async def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     users = get_users(db, skip=skip, limit=limit)
     return users
 
 
-@router_users.get("/{user_id}", response_model=schemas.User)
+@router_users.get("/{user_id}", response_model=user_schema.User)
 async def read_user(user_id: int, db: Session = Depends(get_db)):
-    user = get_user(db, user_id)
-    return user
+    current_user = get_user(db, user_id)
+    return current_user
 
 
 @router_users.patch("/{user_id}")
-async def update_user_route(user_id: int, schema: schemas.UserUpdate, db: Session = Depends(get_db)):
+async def update_user_route(user_id: int, schema: user_schema.UserUpdate, db: Session = Depends(get_db)):
     updated_user = update_user(db, user_id, schema)
     if updated_user:
         await notify_clients(f"User updated: {updated_user.name}")
@@ -131,4 +131,3 @@ async def delete_user_route(user_id: int, db: Session = Depends(get_db)):
         await notify_clients(f"User deleted: ID {user_id}")
         return {"message": "User deleted"}
     return {"message": "User not found"}
-
