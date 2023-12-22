@@ -1,3 +1,5 @@
+import json
+import ast
 from typing import List
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from schemas import event_schema, user_schema
@@ -43,18 +45,17 @@ async def notify_clients(message: str):
         await connection.send_text(message)
 
 
-@router_websocket.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@router_websocket.websocket("/ws/{test_username}")
+async def websocket_endpoint(websocket: WebSocket, test_username: str):
     await manager.connect(websocket)
-    await manager.broadcast(f"Client #{client_id} joined the chat")
+    await manager.broadcast(f"Your ID is #{test_username}")
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.send_personal_message(f"You wrote: {data}", websocket)
-            await manager.broadcast(f"Client #{client_id} says: {data}")
+            await manager.send_personal_message(f"{ast.literal_eval(data)}", websocket)
+            # await manager.broadcast(f"Client #{test_username} says: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat")
 
 
 # Events

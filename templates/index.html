@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Chat</title>
+    <title>Generate templates for User entity</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background-color: #1a1a1a; /* Цвет фона почти чёрный */
             margin: 0;
             padding: 0;
             display: flex;
@@ -19,29 +19,23 @@
 
         .chat-container {
             text-align: center;
-            background-color: #fff;
+            background-color: #333; /* Цвет формы тёмно-серый */
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
             max-width: 400px;
             width: 100%;
+            color: #fff; /* Цвет текста белый */
         }
 
         h1, h2 {
-            color: #333;
+            color: #fff; /* Цвет текста белый */
         }
 
         form {
             display: flex;
             margin-top: 10px;
-        }
-
-        input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 8px;
+            justify-content: center; /* Центрирование кнопки */
         }
 
         button {
@@ -61,10 +55,13 @@
             list-style-type: none;
             padding: 0;
             margin: 10px 0 0;
+            background-color: #444; /* Цвет фона блока вывода данных */
+            border-radius: 4px;
+            padding: 8px;
         }
 
         li {
-            background-color: #f9f9f9;
+            background-color: #555; /* Цвет фона отдельного элемента вывода данных */
             margin: 5px 0;
             padding: 8px;
             border-radius: 4px;
@@ -74,10 +71,9 @@
 
 <body>
     <div class="chat-container">
-        <h1>Get user data</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
+        <h1>Generate templates for User entity</h1>
+        <h2>Your generated ID: <span id="ws-id"></span></h2>
         <form onsubmit="getUserData(event)">
-            <input type="text" id="usernameInput" autocomplete="off" placeholder="Type your username..." />
             <button type="submit">Get Data</button>
         </form>
         <ul id="userData"></ul>
@@ -85,9 +81,15 @@
     <script>
         const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         const serverUrl = window.location.host;
-        const client_id = Math.floor(Math.random() * 1000) + 1;
-        document.querySelector("#ws-id").textContent = client_id;
-        const ws = new WebSocket(`${wsProtocol}://${serverUrl}/ws/${client_id}`);
+
+        const test_id = getRandomNumber(1, 100);
+        const test_username = generateRandomString(10);
+        const test_eventId = getRandomNumber(1, 1000);
+        const test_startTime = getRandomDate(new Date('2022-01-01'), new Date('2022-06-31'));
+        const test_updateTime = getRandomDate(new Date('2022-07-01'), new Date('2022-12-31'));
+
+        document.querySelector("#ws-id").textContent = test_username;
+        const ws = new WebSocket(`${wsProtocol}://${serverUrl}/ws/${test_username}`);
 
         ws.onmessage = function (event) {
             appendMessage(event.data);
@@ -103,9 +105,35 @@
 
         function getUserData(event) {
             event.preventDefault();
-            const input = document.getElementById("usernameInput");
-            ws.send(JSON.stringify({ username: input.value }));
-            input.value = '';
+            ws.send(JSON.stringify({ ID: test_id }));
+            ws.send(JSON.stringify({ Username: test_username }));
+            ws.send(JSON.stringify({ EventId: test_eventId }));
+            ws.send(JSON.stringify({ CreateTime: test_startTime }));
+            ws.send(JSON.stringify({ UpdateTime: test_updateTime }));
+        }
+
+        function generateRandomString(length) {
+            const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                result += characters.charAt(randomIndex);
+            }
+
+            return result;
+        }
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomDate(startDate, endDate) {
+            const startTimestamp = startDate.getTime();
+            const endTimestamp = endDate.getTime();
+            const randomTimestamp = startTimestamp + Math.random() * (endTimestamp - startTimestamp);
+
+            return new Date(randomTimestamp);
         }
     </script>
 </body>
