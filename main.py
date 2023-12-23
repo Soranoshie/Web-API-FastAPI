@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from my_models import event_model, user_model
-from db_context import engine
-from router import router_websocket, router_events, router_users
+from my_db_context import engine
+from my_routes import router_websocket, router_events, router_users
 
 event_model.Base.metadata.create_all(bind=engine)
 user_model.Base.metadata.create_all(bind=engine)

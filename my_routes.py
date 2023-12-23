@@ -2,13 +2,13 @@ import json
 import ast
 from typing import List
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from schemas import event_schema, user_schema
-from db_context import get_db
+from my_schemas import event_schema, user_schema
+from my_db_context import get_db
 from sqlalchemy.orm import Session
-from controller.event_controller import (
+from my_controller.event_controller import (
     create_event, get_events, get_event, update_event, delete_event,
 )
-from controller.user_controller import (
+from my_controller.user_controller import (
     create_user, get_users, get_user, update_user, delete_user
 )
 

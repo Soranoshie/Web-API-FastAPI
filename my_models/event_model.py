@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
-from db_context import Base
+from my_db_context import Base
 
 
 class Event(Base):

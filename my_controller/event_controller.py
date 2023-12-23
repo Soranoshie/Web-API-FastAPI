@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas import event_schema
+from my_schemas import event_schema
 from my_models.event_model import Event
 
 
