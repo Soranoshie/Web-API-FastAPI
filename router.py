@@ -61,9 +61,9 @@ async def websocket_endpoint(websocket: WebSocket, test_username: str):
 # Events
 @router_events.post("/", response_model=event_schema.Event)
 async def create_event_route(event_data: event_schema.EventCreate, db: Session = Depends(get_db)):
-    current_event = create_event(db, event_data)
-    await notify_clients(f"Event added: {current_event.name}")
-    return current_event
+    cur_event = create_event(db, event_data)
+    await notify_clients(f"Event added: {cur_event.name}")
+    return cur_event
 
 
 @router_events.get("/", response_model=List[event_schema.Event])
@@ -74,8 +74,8 @@ async def read_events(skip: int = 0, limit: int = 10, db: Session = Depends(get_
 
 @router_events.get("/{event_id}", response_model=event_schema.Event)
 async def read_event(event_id: int, db: Session = Depends(get_db)):
-    current_event = get_event(db, event_id)
-    return current_event
+    cur_event = get_event(db, event_id)
+    return cur_event
 
 
 @router_events.patch("/{event_id}", response_model=event_schema.Event)
@@ -99,9 +99,9 @@ async def delete_event_route(event_id: int, db: Session = Depends(get_db)):
 # Users
 @router_users.post("/", response_model=user_schema.User)
 async def create_user_route(schema: user_schema.UserCreate, db: Session = Depends(get_db)):
-    current_user = create_user(db, schema)
-    await notify_clients(f"User added: {current_user.name}")
-    return current_user
+    cur_user = create_user(db, schema)
+    await notify_clients(f"User added: {cur_user.name}")
+    return cur_user
 
 
 @router_users.get("/", response_model=List[user_schema.User])
@@ -112,8 +112,8 @@ async def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_d
 
 @router_users.get("/{user_id}", response_model=user_schema.User)
 async def read_user(user_id: int, db: Session = Depends(get_db)):
-    current_user = get_user(db, user_id)
-    return current_user
+    cur_user = get_user(db, user_id)
+    return cur_user
 
 
 @router_users.patch("/{user_id}")
