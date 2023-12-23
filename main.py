@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from models import event_model, user_model
+from my_models import event_model, user_model
 from db_context import engine
 from router import router_websocket, router_events, router_users
 
